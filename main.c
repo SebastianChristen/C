@@ -38,7 +38,7 @@ char verbs[0x5][0xF]  = {// 4x16
     };
 
 
-uint8_t commandLength = 0x20; // hexadezi weil fancy: 2*16 = 32; // type aus stdint.h
+const uint8_t COMMANDLENGTH = 0x20; // hexadezi weil fancy: 2*16 = 32; // type aus stdint.h
 
 void process_command(char* verb, char* arg){
     if (strcmp(verb, "look") == 0 ){
@@ -121,15 +121,15 @@ void readFile(){
 
             switch (i)
             {
-            case 0:
+            case 0: // first index of file: type
                 printf("type: %s\n", tokenPtr);
                 levels[n].type = strdup(tokenPtr);
                 break;
-            case 1:
+            case 1: // 2nd: id (currently unused)
                 printf("id: %s\n", tokenPtr);
                 levels[n].id = strdup(tokenPtr);
                 break;
-            case 2:
+            case 2: // 3rd: name
                 printf("name: %s\n", tokenPtr);
                 levels[n].name = strdup(tokenPtr);
                 break;
@@ -137,7 +137,7 @@ void readFile(){
                 printf("description: %s\n", tokenPtr);
                 levels[n].description = strdup(tokenPtr);
                 break;
-            case 4:
+            case 4: // atoi: converts string to int
                 printf("n: %s\n", tokenPtr);
                 levels[n].n = atoi(strdup(tokenPtr));
                 break;
@@ -192,7 +192,7 @@ void readFile(){
 int main(){
     //setup
     readFile();
-    char command[commandLength];
+    char command[COMMANDLENGTH];
     printf("%s",welcomeText);
 
     //main game loop
