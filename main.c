@@ -13,14 +13,14 @@ struct Item {
 
 
 struct Level {
-    char* type;
-    uint8_t id;
-    char* name;
-    char* description;
-    uint8_t n;
-    uint8_t e;
-    uint8_t s;
-    uint8_t w;  
+    char * type;
+    char * id;
+    char * name;
+    char * description;
+    //uint8_t n;
+    //uint8_t e;
+    //uint8_t s;
+    //uint8_t w;  
     //struct Item item;
 };
 
@@ -66,42 +66,42 @@ void parse(char* input){
 void readFile(){
     FILE* fptr;
     fptr = fopen("world.wad", "r");
-    //struct Level write_struct = { "map", 1, "forest", "ur in a forest", 1,2,3,4 }; // testdaten
-    // writing to file
-    //  fwrite(&write_struct, sizeof(write_struct), 1, infile);
+   
 
-
-    struct Level read_struct;
-
-   // Store the content of the file
+    struct Level levels[3];
     char myString[100];
-    char words[100];
-    //char *tokenPtr;
 
-    // Read the content and print it
+
 
     
-    int n;
+    int n = 0;
     while(fgets(myString, 100, fptr)) {
-        printf("%s", myString);
+        printf("Setting up data for level index %d...", n);
         char *tokenPtr = strtok(myString, "|");
+        // tokenPtr ist nur ein Pointer, und wird die value nicht behalten. deshalb strdup, um den wert endgültig auszulesen
         int i = 0;
         while (tokenPtr != NULL) {
             
+            printf("n ist %d ",n);
 
             switch (i)
             {
             case 0:
                 printf("type: %s\n", tokenPtr);
+                levels[n].type = strdup(tokenPtr);
                 break;
             case 1:
                 printf("id: %s\n", tokenPtr);
+                levels[n].id = strdup(tokenPtr);
                 break;
             case 2:
                 printf("name: %s\n", tokenPtr);
+                levels[n].name = strdup(tokenPtr);
                 break;
             case 3:
                 printf("description: %s\n", tokenPtr);
+                levels[n].description = strdup(tokenPtr);
+
                 break;
             
             default:
@@ -114,26 +114,25 @@ void readFile(){
             tokenPtr = strtok(NULL, "|");
             i++;
         }
+        n++;
     };
 
+    // close file
+    fclose(fptr);
+
+
+    
+    for (int i = 0; i < n; i++) {
+        printf("\n\nLevel %d\n", i);
+        printf("Type: %s\n", levels[i].type);
+        printf("ID: %s\n", levels[i].id);
+        printf("Name: %s\n", levels[i].name);
+        printf("Description: %s\n", levels[i].description);
+    }
    
 
 
-    //while ( words ){
-    //    printf("%s\n",words);
-    //    words = strtok(myString, "|"); // first word in sentence
-    //}
-
-
-   // printf("%s %d %s %s %d %d %d %d", 
-    //    read_struct.type,
-   //     read_struct.id,
-   //     read_struct.name,
-   //     read_struct.description,
-   //     read_struct.n, read_struct.e, read_struct.s, read_struct.w );
-
- // close file
-    fclose(fptr);
+    
 
 
 }
