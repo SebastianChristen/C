@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h> // <- für datatypes und so
-#include <string.h> 
+#include <string.h>
+#include <stdlib.h>
 #include "definitions.h"
 
 // Init
@@ -24,13 +25,15 @@ struct Level {
     //struct Item item;
 };
 
+struct Level levels[3];
+int currentLevel = 0;
 
 
-
-char verbs[0x3][0xF]  = {// 4x16
+char verbs[0x4][0xF]  = {// 4x16
         "look",
         "take",
-        "throw"
+        "throw",
+        "quit"
     };
 
 
@@ -38,28 +41,31 @@ uint8_t commandLength = 0x20; // hexadezi weil fancy: 2*16 = 32; // type aus std
 
 void process_verb(char* verb){
     if (strcmp(verb, "look") == 0 ){
-        printf("You are located in a forest. you look around and see a house.");
+        printf("%s", levels[currentLevel].description);
+    }
+    else if (strcmp(verb, "quit") == 0 ){
+        exit(0);
     }
 }
 
 
 // parser
 void parse(char* input){
-    printf("%s",input);
+    //printf("%s",input);
 
-    char* verb = strtok(input, " "); // first word in sentence
+    char* verb = strsep(&input, " "); // first word in sentence; funktioniert nicht, wenn kein space vorhanden ist
+    verb = strsep(&verb, "\n"); 
 
     uint8_t i; // loop durch array
     for (i = 0; i < sizeof(verbs)/0xF; i++){
         if (strcmp(verbs[i], verb) == 0 ) {
-            printf("%s", verb);
-            printf("!\n\n");
             process_verb(verb);
+            return;
         }
     }
 
+    printf("the parser was unable to process the verb.");
 
-    
 }
 
 
@@ -68,7 +74,7 @@ void readFile(){
     fptr = fopen("world.wad", "r");
    
 
-    struct Level levels[3];
+   
     char myString[100];
 
 
@@ -132,7 +138,7 @@ void readFile(){
    
 
 
-    
+    printf("*** Level setup finished ***");
 
 
 }
@@ -142,13 +148,18 @@ void readFile(){
 
 // main loop
 int main(){
+    //setup
+    readFile();
     char command[commandLength];
     printf("%s",welcomeText);
 
-    printf(">?");
-    //fgets(command, sizeof(command), stdin);
-    //parse(command);
-    readFile();
+    //main game loop
+    while (1){
+        printf("\n>?");
+        fgets(command, sizeof(command), stdin);
+        //if (strcmp(command, "q") == 0){ return 0;}
+        parse(command);
+    }
 
     return 0;
 }
