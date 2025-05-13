@@ -18,10 +18,10 @@ struct Level {
     char * id;
     char * name;
     char * description;
-    char* n;
-    char* e;
-    char* s;
-    char* w;
+    int n;
+    int e;
+    int s;
+    int w;
     //struct Item item;
 };
 
@@ -52,7 +52,23 @@ void process_command(char* verb, char* arg){
             printf("the parser expected a direction.");
             return;
         }
-        printf("you go %s",arg);
+        if (strcmp(arg,"north") == 0){
+            currentLevel = levels[currentLevel].n;
+        } else
+        if (strcmp(arg,"east") == 0){
+            currentLevel = levels[currentLevel].e;
+        } else
+        if (strcmp(arg,"south") == 0){
+            currentLevel = levels[currentLevel].s;
+        }
+        else
+        if (strcmp(arg,"west") == 0){
+            currentLevel = levels[currentLevel].w;
+        } else {
+            printf("this direction is not known.");
+            return;
+        }
+        printf("you move %s",arg);
 
     }
 }
@@ -63,6 +79,7 @@ void parse(char* input){
     //printf("%s",input);
 
     char *argumentPtr = strstr(input, " "); // nimm alles inkl. nach dem leerzeichen
+    argumentPtr = strsep(&argumentPtr, "\n"); // trailing enter wegnehmen
 
     if (argumentPtr == NULL || strcmp(argumentPtr, "") == 0){
         //printf("chicken jockey");
@@ -119,7 +136,22 @@ void readFile(){
             case 3:
                 printf("description: %s\n", tokenPtr);
                 levels[n].description = strdup(tokenPtr);
-
+                break;
+            case 4:
+                printf("n: %s\n", tokenPtr);
+                levels[n].n = atoi(strdup(tokenPtr));
+                break;
+            case 5:
+                printf("e: %s\n", tokenPtr);
+                levels[n].e = atoi(strdup(tokenPtr));
+                break;
+            case 6:
+                printf("s: %s\n", tokenPtr);
+                levels[n].s = atoi(strdup(tokenPtr));
+                break;
+            case 7:
+                printf("w: %s\n", tokenPtr);
+                levels[n].w = atoi(strdup(tokenPtr));
                 break;
 
             default:
@@ -165,6 +197,7 @@ int main(){
 
     //main game loop
     while (1){
+        printf("\n\n%s",levels[currentLevel].description);
         printf("\n>?");
         fgets(command, sizeof(command), stdin);
         parse(command);
