@@ -6,8 +6,10 @@
 
 // Init
 char* welcomeText = "\n\nWelcome to adventure!\n\n";
+const uint8_t COMMANDLENGTH = 0x20; // hexadezi weil fancy: 2*16 = 32; // type aus stdint.h
+const uint8_t MAX_LINE_LEN = 0xFF; //255
 
-struct Item {
+struct Entity {
     char* name;
     char* description;
 };
@@ -22,10 +24,12 @@ struct Level {
     int e;
     int s;
     int w;
-    //struct Item item;
+    struct Entity item;
 };
 
 struct Level levels[3];
+struct Entity entities[3];
+
 int currentLevel = 0;
 
 
@@ -36,9 +40,6 @@ char verbs[0x5][0xF]  = {// 4x16
         "quit",
         "move"
     };
-
-
-const uint8_t COMMANDLENGTH = 0x20; // hexadezi weil fancy: 2*16 = 32; // type aus stdint.h
 
 void process_command(char* verb, char* arg){
     if (strcmp(verb, "look") == 0 ){
@@ -107,60 +108,27 @@ void parse(char* input){
 void readFile(){
     FILE* fptr;
     fptr = fopen("world.wad", "r");
-    char myString[100];
+    char fileLine[MAX_LINE_LEN];
 
     int n = 0;
-    while(fgets(myString, 100, fptr)) {
+    while(fgets(fileLine, MAX_LINE_LEN, fptr)) {
         printf("Setting up data for level index %d...", n);
-        char *tokenPtr = strtok(myString, "|");
+        char *tokenPtr = strtok(fileLine, "|");
         // tokenPtr ist nur ein Pointer, und wird die value nicht behalten. deshalb strdup, um den wert endgültig auszulesen
+
         int i = 0;
         while (tokenPtr != NULL) {
-
-            printf("n ist %d ",n);
-
-            switch (i)
-            {
-            case 0: // first index of file: type
-                printf("type: %s\n", tokenPtr);
-                levels[n].type = strdup(tokenPtr);
-                break;
-            case 1: // 2nd: id (currently unused)
-                printf("id: %s\n", tokenPtr);
-                levels[n].id = strdup(tokenPtr);
-                break;
-            case 2: // 3rd: name
-                printf("name: %s\n", tokenPtr);
-                levels[n].name = strdup(tokenPtr);
-                break;
-            case 3:
-                printf("description: %s\n", tokenPtr);
-                levels[n].description = strdup(tokenPtr);
-                break;
-            case 4: // atoi: converts string to int
-                printf("n: %s\n", tokenPtr);
-                levels[n].n = atoi(strdup(tokenPtr));
-                break;
-            case 5:
-                printf("e: %s\n", tokenPtr);
-                levels[n].e = atoi(strdup(tokenPtr));
-                break;
-            case 6:
-                printf("s: %s\n", tokenPtr);
-                levels[n].s = atoi(strdup(tokenPtr));
-                break;
-            case 7:
-                printf("w: %s\n", tokenPtr);
-                levels[n].w = atoi(strdup(tokenPtr));
-                break;
-
-            default:
-                break;
+            switch (i){
+                case 0: levels[n].type =        strdup(tokenPtr);  break;
+                case 1: levels[n].id =          strdup(tokenPtr);  break;
+                case 2: levels[n].name =        strdup(tokenPtr);  break;
+                case 3: levels[n].description = strdup(tokenPtr);  break;
+                case 4: levels[n].n =           atoi(strdup(tokenPtr)); break;
+                case 5: levels[n].e =           atoi(strdup(tokenPtr)); break;
+                case 6: levels[n].s =           atoi(strdup(tokenPtr)); break;
+                case 7: levels[n].w =           atoi(strdup(tokenPtr)); break;
+                default: break;
             }
-
-
-
-
             tokenPtr = strtok(NULL, "|");
             i++;
         }
@@ -178,11 +146,7 @@ void readFile(){
         printf("Name: %s\n", levels[i].name);
         printf("Description: %s\n", levels[i].description);
     }
-
-
     printf("*** Level setup finished ***");
-
-
 }
 
 
@@ -204,5 +168,5 @@ int main(){
     }
 
     return 0;
-}
+};
 
