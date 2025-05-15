@@ -8,8 +8,18 @@
 char* welcomeText = "\n\nWelcome to adventure!\n\n";
 const uint8_t COMMANDLENGTH = 0x20; // hexadezi weil fancy: 2*16 = 32; // type aus stdint.h
 const uint8_t MAX_LINE_LEN = 0xFF; //255
+#define GENERAL_ARRAY_LEN 3
 
 struct Entity {
+    char * type;
+    char * id;
+    char* name;
+    char* description;
+};
+
+struct Item {
+    char * type;
+    char * id;
     char* name;
     char* description;
 };
@@ -27,8 +37,9 @@ struct Level {
     struct Entity item;
 };
 
-struct Level levels[3];
-struct Entity entities[3];
+struct Level levels[GENERAL_ARRAY_LEN];
+struct Entity entities[GENERAL_ARRAY_LEN];
+struct Item items[GENERAL_ARRAY_LEN];
 
 int currentLevel = 0;
 
@@ -104,20 +115,12 @@ void parse(char* input){
 
 }
 
-
-void storeLevel(char fileLine[]){
-    char fileLineForId[MAX_LINE_LEN];
-    strcpy(fileLineForId, fileLine);        // create a copy of fileLine and use it only for getting the Id
-
-
-    // returns the second element of the string (seperated by "|"), therefore the id
-    strtok(fileLineForId, "|");                  // split until first delimiter
-    char* idTokenPtr = strtok(NULL,"|");         // take the part after the delimiter (the Id)
-    int levelId = atoi(idTokenPtr);              // turn Id from string to int
-
-
+// ---
+// iterates trough the current Line and store attributes in struct array at current Id index
+//
+void storeLevel(char fileLine[], int levelId){
+    char* tokenPtr = strtok(fileLine, "|");    // init new tokenPtr (start of current Line String)
     int i = 0;
-    char* tokenPtr = strtok(fileLine, "|");    // init new tokenPtr and set value to Initial Value since strtok destroyed the other pointer
     while (tokenPtr != NULL) {
         printf("tokenptr %d %s",i,tokenPtr);
         switch (i){
@@ -136,6 +139,23 @@ void storeLevel(char fileLine[]){
     }
 }
 
+void storeItem(char fileLine[], int itemId){
+    char* tokenPtr = strtok(fileLine, "|");    // init new tokenPtr (start of current Line String)
+    int i = 0;
+    while (tokenPtr != NULL) {
+        printf("tokenptr %d %s",i,tokenPtr);
+        switch (i){
+            case 0: items[itemId].type =        strdup(tokenPtr);  break;
+            case 1: items[itemId].id =          strdup(tokenPtr);  break;
+            case 2: items[itemId].name =        strdup(tokenPtr);  break;
+            case 3: items[itemId].description = strdup(tokenPtr);  break;
+            default: break;
+        }
+        tokenPtr = strtok(NULL, "|");
+        i++;
+    }
+}
+
 
 void readFile(){
     FILE* fptr;
@@ -144,12 +164,20 @@ void readFile(){
 
     int n = 0;
     while(fgets(fileLine, MAX_LINE_LEN, fptr)) {
-        printf("Setting up data for line index %d... \n", n);
+       
+        // --- prepare ID
+        char fileLineForId[MAX_LINE_LEN];       // set up array
+        strcpy(fileLineForId, fileLine);        // create a copy of fileLine and use it only for getting the Id
+        // --- Read ID
+        strtok(fileLineForId, "|");                  // split until first delimiter
+        char* idTokenPtr = strtok(NULL,"|");         // take the part after the delimiter (the Id)
+        int id = atoi(idTokenPtr);              // turn Id from string to int
+
 
         if (strncmp("map", fileLine, strlen("map")) == 0){ // check if string start with substring function
-            storeLevel(fileLine);
+            storeLevel(fileLine, id);
         } else if (strncmp("item", fileLine, strlen("item")) == 0){ // check if string start with substring function
-            printf("yup, thats an item.\n");
+            storeItem(fileLine, id);
         }
 
         n++;
@@ -157,16 +185,6 @@ void readFile(){
 
     // close file
     fclose(fptr);
-
-
-    for (int i = 0; i < n; i++) {
-        printf("\n\nLevel %d\n", i);
-        printf("Type: %s\n", levels[i].type);
-        printf("ID: %s\n", levels[i].id);
-        printf("Name: %s\n", levels[i].name);
-        printf("Description: %s\n", levels[i].description);
-    }
-    printf("*** Level setup finished ***");
 }
 
 
@@ -176,6 +194,30 @@ void readFile(){
 int main(){
     //setup
     readFile();
+
+
+    // JUST TO MAKE SURE IT WORKS
+    for (int i = 0; i < GENERAL_ARRAY_LEN; i++) {
+        printf("Type: %s\n", levels[i].type);
+        printf("ID: %s\n", levels[i].id);
+        printf("Name: %s\n", levels[i].name);
+        printf("Description: %s\n", levels[i].description);
+        printf("N: %d\n", levels[i].n);
+        printf("E: %d\n", levels[i].e);
+        printf("S: %d\n", levels[i].s);
+        printf("W: %d\n\n", levels[i].w);
+    }
+
+    // JUST TO MAKE SURE IT WORKS
+    for (int i = 0; i < GENERAL_ARRAY_LEN; i++) {
+        printf("Type: %s\n", items[i].type);
+        printf("ID: %s\n", items[i].id);
+        printf("Name: %s\n", items[i].name);
+        printf("Description: %s\n\n", items[i].description);
+    }
+
+
+
     char command[COMMANDLENGTH];
     printf("%s",welcomeText);
 
