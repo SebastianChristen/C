@@ -105,6 +105,38 @@ void parse(char* input){
 }
 
 
+void storeLevel(char fileLine[]){
+    char fileLineForId[MAX_LINE_LEN];
+    strcpy(fileLineForId, fileLine);        // create a copy of fileLine and use it only for getting the Id
+
+
+    // returns the second element of the string (seperated by "|"), therefore the id
+    strtok(fileLineForId, "|");                  // split until first delimiter
+    char* idTokenPtr = strtok(NULL,"|");         // take the part after the delimiter (the Id)
+    int levelId = atoi(idTokenPtr);              // turn Id from string to int
+
+
+    int i = 0;
+    char* tokenPtr = strtok(fileLine, "|");    // init new tokenPtr and set value to Initial Value since strtok destroyed the other pointer
+    while (tokenPtr != NULL) {
+        printf("tokenptr %d %s",i,tokenPtr);
+        switch (i){
+            case 0: levels[levelId].type =        strdup(tokenPtr);  break;
+            case 1: levels[levelId].id =          strdup(tokenPtr);  break;
+            case 2: levels[levelId].name =        strdup(tokenPtr);  break;
+            case 3: levels[levelId].description = strdup(tokenPtr);  break;
+            case 4: levels[levelId].n =           atoi(strdup(tokenPtr)); break;
+            case 5: levels[levelId].e =           atoi(strdup(tokenPtr)); break;
+            case 6: levels[levelId].s =           atoi(strdup(tokenPtr)); break;
+            case 7: levels[levelId].w =           atoi(strdup(tokenPtr)); break;
+            default: break;
+        }
+        tokenPtr = strtok(NULL, "|");
+        i++;
+    }
+}
+
+
 void readFile(){
     FILE* fptr;
     fptr = fopen("world.wad", "r");
@@ -112,26 +144,14 @@ void readFile(){
 
     int n = 0;
     while(fgets(fileLine, MAX_LINE_LEN, fptr)) {
-        printf("Setting up data for level index %d...", n);
-        char *tokenPtr = strtok(fileLine, "|");
-        // tokenPtr ist nur ein Pointer, und wird die value nicht behalten. deshalb strdup, um den wert endgültig auszulesen
+        printf("Setting up data for line index %d... \n", n);
 
-        int i = 0;
-        while (tokenPtr != NULL) {
-            switch (i){
-                case 0: levels[n].type =        strdup(tokenPtr);  break;
-                case 1: levels[n].id =          strdup(tokenPtr);  break;
-                case 2: levels[n].name =        strdup(tokenPtr);  break;
-                case 3: levels[n].description = strdup(tokenPtr);  break;
-                case 4: levels[n].n =           atoi(strdup(tokenPtr)); break;
-                case 5: levels[n].e =           atoi(strdup(tokenPtr)); break;
-                case 6: levels[n].s =           atoi(strdup(tokenPtr)); break;
-                case 7: levels[n].w =           atoi(strdup(tokenPtr)); break;
-                default: break;
-            }
-            tokenPtr = strtok(NULL, "|");
-            i++;
+        if (strncmp("map", fileLine, strlen("map")) == 0){ // check if string start with substring function
+            storeLevel(fileLine);
+        } else if (strncmp("item", fileLine, strlen("item")) == 0){ // check if string start with substring function
+            printf("yup, thats an item.\n");
         }
+
         n++;
     };
 
