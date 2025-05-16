@@ -44,20 +44,24 @@ struct Item items[GENERAL_ARRAY_LEN];
 int currentLevel = 0;
 
 
-char verbs[0x5][0xF]  = {// 4x16
-        "look",
-        "take",
-        "throw",
-        "quit",
-        "move"
-    };
-
 void process_command(char* verb, char* arg){
     if (strcmp(verb, "look") == 0 ){
         printf("%s", levels[currentLevel].description);
     }
     else if (strcmp(verb, "quit") == 0 ){
         exit(0);
+    }
+    else if (strcmp(verb,"n") == 0){
+        currentLevel = levels[currentLevel].n;
+    }
+    else if (strcmp(verb,"e") == 0){
+        currentLevel = levels[currentLevel].e;
+    }
+    else if (strcmp(verb,"s") == 0){
+        currentLevel = levels[currentLevel].s;
+    }
+    else if (strcmp(verb,"w") == 0){
+        currentLevel = levels[currentLevel].w;
     }
     else if (strcmp(verb, "move") == 0 ){
         if (arg == NULL) {
@@ -81,8 +85,13 @@ void process_command(char* verb, char* arg){
             return;
         }
         printf("you move %s",arg);
-
     }
+
+
+    else {
+        printf("the parser was unable to process the verb.");
+    }
+
 }
 
 
@@ -104,14 +113,8 @@ void parse(char* input){
     verb = strsep(&verb, "\n");
 
     uint8_t i; // loop durch array
-    for (i = 0; i < sizeof(verbs)/0xF; i++){
-        if (strcmp(verbs[i], verb) == 0 ) {
-            process_command(verb, argumentPtr);
-            return;
-        }
-    }
-
-    printf("the parser was unable to process the verb.");
+    process_command(verb, argumentPtr);
+    return;
 
 }
 
@@ -164,7 +167,7 @@ void readFile(){
 
     int n = 0;
     while(fgets(fileLine, MAX_LINE_LEN, fptr)) {
-       
+
         // --- prepare ID
         char fileLineForId[MAX_LINE_LEN];       // set up array
         strcpy(fileLineForId, fileLine);        // create a copy of fileLine and use it only for getting the Id
@@ -223,7 +226,22 @@ int main(){
 
     //main game loop
     while (1){
+
+        // explain current situation
         printf("\n\n%s",levels[currentLevel].description);
+        int n = levels[currentLevel].n;
+        int e = levels[currentLevel].e;
+        int s = levels[currentLevel].s;
+        int w = levels[currentLevel].w;
+        printf("\nIn the north, you notice a %s.",levels[n].name);
+        printf("\nIn the east,  you notice a %s.",levels[e].name);
+        printf("\nIn the south, you notice a %s.",levels[s].name);
+        printf("\nIn the west,  you notice a %s.",levels[w].name);
+
+
+
+
+
         printf("\n>?");
         fgets(command, sizeof(command), stdin);
         parse(command);

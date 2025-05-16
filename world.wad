@@ -1,3 +1,22 @@
-map|0|forest|You are located in a forest. you look around and see a house.|1|1|1|1
-map|1|lake|you are at a lake|0|0|0|0
+map|0|forest|You are in the center of a dense forest, surrounded by ancient, towering trees whispering secrets.|1|3|2|4
+map|1|mountain_base|A rugged path leads up the mountain, where the sound of distant avalanches echoes ominously.|5|0|7|0
+map|2|village|The cozy village is bustling with life, its inhabitants wary of strangers. You can sense hidden stories.|0|0|11|0
+map|3|cave_entrance|At the cave entrance, a chill in the air hints at deeper mysteries waiting in its depths.|0|6|0|0
+map|4|river_bank|You follow the winding river bank, noticing strange symbols etched on nearby rocks.|0|0|0|12
+map|5|mountain_peak|At the peak, you find an ancient altar, whispering with forgotten incantations in the thin air.|0|0|1|9
+map|6|cave_tunnel|A narrow, winding tunnel leads further into the bowels of the earth, where shadows dance eerily.|10|3|0|0
+map|7|desert_oasis|In the heart of the desert, an oasis offers respite, its waters rumored to possess healing properties.|0|8|0|1
+map|8|desert_ruins|Explore the ruins of an ancient civilization, where sand hides secrets and stories untold.|14|0|0|7
+map|9|hidden_valley|A secluded valley, lush and vibrant, where strange wildlife roams freely.|0|5|0|13
+map|10|underground_lake|A subterranean lake stretches into darkness, its waters eerily still and reflective.|0|6|15|0
+map|11|castle_gate|The imposing yet majestic castle stands before you, its gates slightly ajar and inviting.|6|0|0|2
+map|12|enchanted_glade|A glade imbued with magic, where the boundaries between reality and fantasy blur.|0|0|4|16
+map|13|abandoned_shack|A rundown shack hides a trapdoor beneath decaying floorboards, promising adventures below.|0|9|0|0
+map|14|sand_dunes|Beyond the ruins, shifting sands guard their secrets jealously, concealing paths to the unknown.|0|0|8|0
+map|15|crystal_cavern|Glistening crystals adorn the cavern walls, casting eerie light in all directions.|0|10|0|0
+map|16|forest_ruins|Ancient stone ruins wrapped in vines, echoing with the whispers of a lost civilization.|0|0|0|12
+map|17|library_of_wisdom|Books filled with forgotten lore line the walls, watched over by an enigmatic librarian.|19|0|0|0
+map|18|wizard_tower|Atop a misty hill, a wizard’s tower looms, its halls echoing with arcane energies.|0|0|0|19
+map|19|shadowy_grove|The grove is dim, shadows play tricks among the trees, hinting at secrets shrouded in darkness.|18|17|0|0
+map|20|ancient_pyramid|The pyramid rises from the sands, sheltering hidden chambers and eternal mysteries.|0|0|0|8
 item|0|diary|A diary. Has a lot of pages.
