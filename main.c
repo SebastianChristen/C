@@ -8,33 +8,33 @@
 char* welcomeText = "\n\nWelcome to adventure!\n\n";
 const uint8_t COMMANDLENGTH = 0x20; // hexadezi weil fancy: 2*16 = 32; // type aus stdint.h
 const uint8_t MAX_LINE_LEN = 0xFF; //255
-#define GENERAL_ARRAY_LEN 3
+#define GENERAL_ARRAY_LEN 0x20 // 32
 
 struct Entity {
     char * type;
-    char * id;
+    int id;
     char* name;
     char* description;
 };
 
 struct Item {
     char * type;
-    char * id;
+    int id;
     char* name;
     char* description;
+    int position;
 };
 
 
 struct Level {
     char * type;
-    char * id;
+    int id;
     char * name;
     char * description;
     int n;
     int e;
     int s;
     int w;
-    struct Entity item;
 };
 
 struct Level levels[GENERAL_ARRAY_LEN];
@@ -112,7 +112,6 @@ void parse(char* input){
     char* verb = strsep(&input, " ");
     verb = strsep(&verb, "\n");
 
-    uint8_t i; // loop durch array
     process_command(verb, argumentPtr);
     return;
 
@@ -128,13 +127,13 @@ void storeLevel(char fileLine[], int levelId){
         printf("tokenptr %d %s",i,tokenPtr);
         switch (i){
             case 0: levels[levelId].type =        strdup(tokenPtr);  break;
-            case 1: levels[levelId].id =          strdup(tokenPtr);  break;
+            case 1: levels[levelId].id =          atoi(tokenPtr);  break;
             case 2: levels[levelId].name =        strdup(tokenPtr);  break;
             case 3: levels[levelId].description = strdup(tokenPtr);  break;
-            case 4: levels[levelId].n =           atoi(strdup(tokenPtr)); break;
-            case 5: levels[levelId].e =           atoi(strdup(tokenPtr)); break;
-            case 6: levels[levelId].s =           atoi(strdup(tokenPtr)); break;
-            case 7: levels[levelId].w =           atoi(strdup(tokenPtr)); break;
+            case 4: levels[levelId].n =           atoi(tokenPtr); break;
+            case 5: levels[levelId].e =           atoi(tokenPtr); break;
+            case 6: levels[levelId].s =           atoi(tokenPtr); break;
+            case 7: levels[levelId].w =           atoi(tokenPtr); break;
             default: break;
         }
         tokenPtr = strtok(NULL, "|");
@@ -149,9 +148,10 @@ void storeItem(char fileLine[], int itemId){
         printf("tokenptr %d %s",i,tokenPtr);
         switch (i){
             case 0: items[itemId].type =        strdup(tokenPtr);  break;
-            case 1: items[itemId].id =          strdup(tokenPtr);  break;
+            case 1: items[itemId].id =          atoi(tokenPtr);  break;
             case 2: items[itemId].name =        strdup(tokenPtr);  break;
             case 3: items[itemId].description = strdup(tokenPtr);  break;
+            case 4: items[itemId].position =    atoi(tokenPtr);  break;
             default: break;
         }
         tokenPtr = strtok(NULL, "|");
@@ -202,7 +202,7 @@ int main(){
     // JUST TO MAKE SURE IT WORKS
     for (int i = 0; i < GENERAL_ARRAY_LEN; i++) {
         printf("Type: %s\n", levels[i].type);
-        printf("ID: %s\n", levels[i].id);
+        printf("ID: %d\n", levels[i].id);
         printf("Name: %s\n", levels[i].name);
         printf("Description: %s\n", levels[i].description);
         printf("N: %d\n", levels[i].n);
@@ -214,11 +214,12 @@ int main(){
     // JUST TO MAKE SURE IT WORKS
     for (int i = 0; i < GENERAL_ARRAY_LEN; i++) {
         printf("Type: %s\n", items[i].type);
-        printf("ID: %s\n", items[i].id);
+        printf("ID: %d\n", items[i].id);
         printf("Name: %s\n", items[i].name);
-        printf("Description: %s\n\n", items[i].description);
-    }
-
+        printf("Description: %s\n", items[i].description);
+        printf("Position: %d\n\n", items[i].position);
+    } 
+ 
 
 
     char command[COMMANDLENGTH];
@@ -238,6 +239,12 @@ int main(){
         printf("\nIn the south, you notice a %s.",levels[s].name);
         printf("\nIn the west,  you notice a %s.",levels[w].name);
 
+        // search for items
+        for (int i = 0; i < GENERAL_ARRAY_LEN; i++){
+            if (levels[currentLevel].id == items[i].position){
+                printf("\nthere is a %s.", items[i].name);
+            }
+        }
 
 
 

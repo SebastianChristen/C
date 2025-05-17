@@ -19,4 +19,4 @@ map|17|library_of_wisdom|Books filled with forgotten lore line the walls, watche
 map|18|wizard_tower|Atop a misty hill, a wizard’s tower looms, its halls echoing with arcane energies.|0|0|0|19
 map|19|shadowy_grove|The grove is dim, shadows play tricks among the trees, hinting at secrets shrouded in darkness.|18|17|0|0
 map|20|ancient_pyramid|The pyramid rises from the sands, sheltering hidden chambers and eternal mysteries.|0|0|0|8
-item|0|diary|A diary. Has a lot of pages.
+item|0|diary|A diary. Has a lot of pages.|0
