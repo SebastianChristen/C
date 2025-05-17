@@ -8,7 +8,8 @@
 char* welcomeText = "\n\nWelcome to adventure!\n\n";
 const uint8_t COMMANDLENGTH = 0x20; // hexadezi weil fancy: 2*16 = 32; // type aus stdint.h
 const uint8_t MAX_LINE_LEN = 0xFF; //255
-#define GENERAL_ARRAY_LEN 0x20 // 32
+
+#define ALEN(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 struct Entity {
     char * type;
@@ -37,31 +38,32 @@ struct Level {
     int w;
 };
 
-struct Level levels[GENERAL_ARRAY_LEN];
-struct Entity entities[GENERAL_ARRAY_LEN];
-struct Item items[GENERAL_ARRAY_LEN];
-
-int currentLevel = 0;
+struct Level* g_levels;
+struct Entity* g_entities;
+struct Item* g_items;
+int g_levelCount = 0;
+int g_itemCount = 0;
+int g_currentLevel = 0;
 
 
 void process_command(char* verb, char* arg){
     if (strcmp(verb, "look") == 0 ){
-        printf("%s", levels[currentLevel].description);
+        printf("%s", g_levels[g_currentLevel].description);
     }
     else if (strcmp(verb, "quit") == 0 ){
         exit(0);
     }
     else if (strcmp(verb,"n") == 0){
-        currentLevel = levels[currentLevel].n;
+        g_currentLevel = g_levels[g_currentLevel].n;
     }
     else if (strcmp(verb,"e") == 0){
-        currentLevel = levels[currentLevel].e;
+        g_currentLevel = g_levels[g_currentLevel].e;
     }
     else if (strcmp(verb,"s") == 0){
-        currentLevel = levels[currentLevel].s;
+        g_currentLevel = g_levels[g_currentLevel].s;
     }
     else if (strcmp(verb,"w") == 0){
-        currentLevel = levels[currentLevel].w;
+        g_currentLevel = g_levels[g_currentLevel].w;
     }
     else if (strcmp(verb, "move") == 0 ){
         if (arg == NULL) {
@@ -69,17 +71,17 @@ void process_command(char* verb, char* arg){
             return;
         }
         if (strcmp(arg,"north") == 0){
-            currentLevel = levels[currentLevel].n;
+            g_currentLevel = g_levels[g_currentLevel].n;
         } else
         if (strcmp(arg,"east") == 0){
-            currentLevel = levels[currentLevel].e;
+            g_currentLevel = g_levels[g_currentLevel].e;
         } else
         if (strcmp(arg,"south") == 0){
-            currentLevel = levels[currentLevel].s;
+            g_currentLevel = g_levels[g_currentLevel].s;
         }
         else
         if (strcmp(arg,"west") == 0){
-            currentLevel = levels[currentLevel].w;
+            g_currentLevel = g_levels[g_currentLevel].w;
         } else {
             printf("this direction is not known.");
             return;
@@ -126,14 +128,14 @@ void storeLevel(char fileLine[], int levelId){
     while (tokenPtr != NULL) {
         printf("tokenptr %d %s",i,tokenPtr);
         switch (i){
-            case 0: levels[levelId].type =        strdup(tokenPtr);  break;
-            case 1: levels[levelId].id =          atoi(tokenPtr);  break;
-            case 2: levels[levelId].name =        strdup(tokenPtr);  break;
-            case 3: levels[levelId].description = strdup(tokenPtr);  break;
-            case 4: levels[levelId].n =           atoi(tokenPtr); break;
-            case 5: levels[levelId].e =           atoi(tokenPtr); break;
-            case 6: levels[levelId].s =           atoi(tokenPtr); break;
-            case 7: levels[levelId].w =           atoi(tokenPtr); break;
+            case 0: g_levels[levelId].type =        strdup(tokenPtr);  break;
+            case 1: g_levels[levelId].id =          atoi(tokenPtr);  break;
+            case 2: g_levels[levelId].name =        strdup(tokenPtr);  break;
+            case 3: g_levels[levelId].description = strdup(tokenPtr);  break;
+            case 4: g_levels[levelId].n =           atoi(tokenPtr); break;
+            case 5: g_levels[levelId].e =           atoi(tokenPtr); break;
+            case 6: g_levels[levelId].s =           atoi(tokenPtr); break;
+            case 7: g_levels[levelId].w =           atoi(tokenPtr); break;
             default: break;
         }
         tokenPtr = strtok(NULL, "|");
@@ -147,11 +149,11 @@ void storeItem(char fileLine[], int itemId){
     while (tokenPtr != NULL) {
         printf("tokenptr %d %s",i,tokenPtr);
         switch (i){
-            case 0: items[itemId].type =        strdup(tokenPtr);  break;
-            case 1: items[itemId].id =          atoi(tokenPtr);  break;
-            case 2: items[itemId].name =        strdup(tokenPtr);  break;
-            case 3: items[itemId].description = strdup(tokenPtr);  break;
-            case 4: items[itemId].position =    atoi(tokenPtr);  break;
+            case 0: g_items[itemId].type =        strdup(tokenPtr);  break;
+            case 1: g_items[itemId].id =          atoi(tokenPtr);  break;
+            case 2: g_items[itemId].name =        strdup(tokenPtr);  break;
+            case 3: g_items[itemId].description = strdup(tokenPtr);  break;
+            case 4: g_items[itemId].position =    atoi(tokenPtr);  break;
             default: break;
         }
         tokenPtr = strtok(NULL, "|");
@@ -164,6 +166,26 @@ void readFile(){
     FILE* fptr;
     fptr = fopen("world.wad", "r");
     char fileLine[MAX_LINE_LEN];
+
+
+    //--- looks good but look again ---
+    int countLevels = 0, countItems = 0;
+
+    // Set countLevels and countItems
+    // if line startwith map, increase countLevels ...
+    while (fgets(fileLine, MAX_LINE_LEN, fptr)) {
+        if (strncmp("map", fileLine, 3) == 0) countLevels++;
+        else if (strncmp("item", fileLine, 4) == 0) countItems++;
+    }
+    rewind(fptr); // go back to start of file
+
+    // allocate only what we need
+    g_levels = malloc(sizeof(struct Level) * countLevels);
+    g_items = malloc(sizeof(struct Item) * countItems);
+    g_levelCount = countLevels;
+    g_itemCount = countItems;
+    // ---
+
 
     int n = 0;
     while(fgets(fileLine, MAX_LINE_LEN, fptr)) {
@@ -200,24 +222,24 @@ int main(){
 
 
     // JUST TO MAKE SURE IT WORKS
-    for (int i = 0; i < GENERAL_ARRAY_LEN; i++) {
-        printf("Type: %s\n", levels[i].type);
-        printf("ID: %d\n", levels[i].id);
-        printf("Name: %s\n", levels[i].name);
-        printf("Description: %s\n", levels[i].description);
-        printf("N: %d\n", levels[i].n);
-        printf("E: %d\n", levels[i].e);
-        printf("S: %d\n", levels[i].s);
-        printf("W: %d\n\n", levels[i].w);
+    for (int i = 0; i < g_levelCount; i++) {
+        printf("Type: %s\n", g_levels[i].type);
+        printf("ID: %d\n", g_levels[i].id);
+        printf("Name: %s\n", g_levels[i].name);
+        printf("Description: %s\n", g_levels[i].description);
+        printf("N: %d\n", g_levels[i].n);
+        printf("E: %d\n", g_levels[i].e);
+        printf("S: %d\n", g_levels[i].s);
+        printf("W: %d\n\n", g_levels[i].w);
     }
 
     // JUST TO MAKE SURE IT WORKS
-    for (int i = 0; i < GENERAL_ARRAY_LEN; i++) {
-        printf("Type: %s\n", items[i].type);
-        printf("ID: %d\n", items[i].id);
-        printf("Name: %s\n", items[i].name);
-        printf("Description: %s\n", items[i].description);
-        printf("Position: %d\n\n", items[i].position);
+    for (int i = 0; i < g_itemCount; i++) {
+        printf("Type: %s\n", g_items[i].type);
+        printf("ID: %d\n", g_items[i].id);
+        printf("Name: %s\n", g_items[i].name);
+        printf("Description: %s\n", g_items[i].description);
+        printf("Position: %d\n\n", g_items[i].position);
     } 
  
 
@@ -229,20 +251,20 @@ int main(){
     while (1){
 
         // explain current situation
-        printf("\n\n%s",levels[currentLevel].description);
-        int n = levels[currentLevel].n;
-        int e = levels[currentLevel].e;
-        int s = levels[currentLevel].s;
-        int w = levels[currentLevel].w;
-        printf("\nIn the north, you notice a %s.",levels[n].name);
-        printf("\nIn the east,  you notice a %s.",levels[e].name);
-        printf("\nIn the south, you notice a %s.",levels[s].name);
-        printf("\nIn the west,  you notice a %s.",levels[w].name);
+        printf("\n\n%s",g_levels[g_currentLevel].description);
+        int n = g_levels[g_currentLevel].n;
+        int e = g_levels[g_currentLevel].e;
+        int s = g_levels[g_currentLevel].s;
+        int w = g_levels[g_currentLevel].w;
+        printf("\nIn the north, you notice a %s.",g_levels[n].name);
+        printf("\nIn the east,  you notice a %s.",g_levels[e].name);
+        printf("\nIn the south, you notice a %s.",g_levels[s].name);
+        printf("\nIn the west,  you notice a %s.",g_levels[w].name);
 
-        // search for items
-        for (int i = 0; i < GENERAL_ARRAY_LEN; i++){
-            if (levels[currentLevel].id == items[i].position){
-                printf("\nthere is a %s.", items[i].name);
+        // search for g_items
+        for (int i = 0; i < g_itemCount; i++){
+            if (g_levels[g_currentLevel].id == g_items[i].position){
+                printf("\nthere is a %s.", g_items[i].name);
             }
         }
 
