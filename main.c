@@ -38,6 +38,27 @@ struct Level {
     int w;
 };
 
+
+struct Command {
+    char* command;
+    char* function;
+};
+
+struct Command g_commands[10] = {
+
+    {"look", "look"},
+    {"quit", "quit_game"},
+    {"n", "move_north"},
+    {"e", "move_east"},
+    {"s", "move_south"},
+    {"w", "move_west"},
+
+
+
+};
+
+
+
 struct Level* g_levels;
 struct Entity* g_entities;
 struct Item* g_items;
