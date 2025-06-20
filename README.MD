@@ -6,3 +6,5 @@ gcc -o chickenjockey main.c `sdl2-config --cflags --libs`
 cmake -S . -B build
 cmake --build build
 ./build/sdl-helloworld
+
+g++ main.cpp -o adventure && ./adventure

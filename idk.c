@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
@@ -11,10 +12,14 @@ static SDL_FRect mouseposrect;
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
     Uint8 r;
+    Uint8 g;
+    Uint8 b;
 
     /* fade between shades of red every 3 seconds, from 0 to 255. */
     r = (Uint8) ((((float) (SDL_GetTicks() % 3000)) / 3000.0f) * 255.0f);
-    SDL_SetRenderDrawColor(renderer, r, 0, 0, 255);
+    g = (Uint8) ((((float) (SDL_GetTicks() % 1000)) / 3000.0f) * 255.0f);
+    b = (Uint8) ((((float) (SDL_GetTicks() % 2000)) / 3000.0f) * 255.0f);
+    SDL_SetRenderDrawColor(renderer, r, g, b, 255);
 
     /* you have to draw the whole window every frame. Clearing it makes sure the whole thing is sane. */
     SDL_RenderClear(renderer);  /* clear whole window to that fade color. */
@@ -24,6 +29,12 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     /* draw a square where the mouse cursor currently is. */
     SDL_RenderFillRect(renderer, &mouseposrect);
+    SDL_RenderDebugText(renderer, 50, 50 , "hello");
+    TTF_RenderText_Solid(TTF_Font, "hello", 0, SDL_Color);
+
+
+
+    
 
     /* put everything we drew to the screen. */
     SDL_RenderPresent(renderer);

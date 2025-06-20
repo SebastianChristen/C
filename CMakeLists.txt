@@ -15,6 +15,17 @@ if(DOWNLOAD_DEPENDENCIES)
         EXCLUDE_FROM_ALL
     )
     FetchContent_MakeAvailable(SDL3)
+
+    FetchContent_Declare(
+        SDL3_ttf
+        GIT_REPOSITORY "https://github.com/libsdl-org/SDL_ttf.git"
+        GIT_TAG "main"
+        EXCLUDE_FROM_ALL
+    )
+    FetchContent_MakeAvailable(SDL3)
+    FetchContent_MakeAvailable(SDL3_ttf)
+
+
 else()
     # find_package looks for already-installed system packages.
     # Configure with `-DCMAKE_PREFIX_PATH="/path/to/package1;/path/to/package2"`
@@ -34,6 +45,7 @@ add_executable(sdl-helloworld
 )
 
 target_link_libraries(sdl-helloworld PRIVATE SDL3::SDL3)
+target_link_libraries(sdl-helloworld PRIVATE SDL3_ttf::SDL3_ttf)
 
 # This is safe to set on all platforms. Otherwise your SDL app will
 #  have a terminal window pop up with it on Windows.
